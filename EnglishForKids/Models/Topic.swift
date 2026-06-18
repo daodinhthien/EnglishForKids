@@ -17,5 +17,10 @@ struct Topic: Codable {
 }
 
 struct LessonResponse: Codable {
-    let topics: [Topic]
+    let topics: [Topic]?
+    let dialogues: [DialogueTopic]?
+    let fillExercises: [FillExercise]?
+    let matchPairs: [MatchPair]?
+    let pictureQuestions: [PictureQuestion]?
+    let arrangeExercises: [ArrangeExercise]?
 }

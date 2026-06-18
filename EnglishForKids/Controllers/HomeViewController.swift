@@ -105,10 +105,40 @@ extension HomeViewController {
         let data = try? Data(contentsOf: fileURL)
         
         if let response = data.flatMap({ try? JSONDecoder().decode(LessonResponse.self, from: $0) }) {
+            APIService.share.response = response
+            
             await MainActor.run {
-                self.topics = response.topics
+                self.topics = response.topics ?? []
                 self.collectionView.reloadData()
             }
+        }
+    }
+    
+    private func updateData() { // convert data local sang json
+        let res = LessonResponse(topics: self.topics, dialogues: AppData.dialogues, fillExercises: AppData.fillExercises, matchPairs: AppData.matchPairs, pictureQuestions: AppData.pictureQuestions, arrangeExercises: AppData.arrangeExercises)
+        
+        do {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.prettyPrinted]
+
+            let data = try encoder.encode(res)
+
+            let documents =
+                FileManager.default.urls(
+                    for: .documentDirectory,
+                    in: .userDomainMask
+                )[0]
+
+            let fileURL =
+                documents.appendingPathComponent(
+                    "vocabulary.json"
+                )
+
+            try data.write(to: fileURL)
+
+            print(fileURL.path)
+        } catch {
+            print(error)
         }
     }
 }

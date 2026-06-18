@@ -10,6 +10,7 @@ import Foundation
 final class APIService {
     static let share = APIService()
     private init() {}
+    var response: LessonResponse?
     
     func checkRemoteConfig() async throws -> RemoteConfig? {
         let url = URL(string: "https://englishforkids-c69c1.web.app/config.json")!

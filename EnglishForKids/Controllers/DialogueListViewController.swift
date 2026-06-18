@@ -2,7 +2,7 @@ import UIKit
 
 class DialogueListViewController: UIViewController {
 
-    private let topics = AppData.dialogues
+    private var topics: [DialogueTopic] = []
     private var collectionView: UICollectionView!
 
     override func viewDidLoad() {
@@ -36,11 +36,15 @@ class DialogueListViewController: UIViewController {
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
+        
+        self.topics = APIService.share.response?.dialogues ?? []
     }
 }
 
 extension DialogueListViewController: UICollectionViewDataSource, UICollectionViewDelegate {
-    func collectionView(_ cv: UICollectionView, numberOfItemsInSection section: Int) -> Int { topics.count }
+    func collectionView(_ cv: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        topics.count
+    }
 
     func collectionView(_ cv: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = cv.dequeueReusableCell(withReuseIdentifier: DialogueCell.id, for: indexPath) as! DialogueCell

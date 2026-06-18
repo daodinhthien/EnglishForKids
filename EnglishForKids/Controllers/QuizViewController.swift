@@ -441,5 +441,10 @@ class QuizViewController: UIViewController {
         // Dùng haptic feedback thay vì âm thanh để đơn giản
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(correct ? .success : .error)
+        if correct {
+            SoundManager.shared.playCorrect()
+            return
+        }
+        SoundManager.shared.playWrong()
     }
 }

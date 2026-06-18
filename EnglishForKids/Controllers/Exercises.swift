@@ -4,7 +4,8 @@ import UIKit
 
 class MatchViewController: UIViewController {
 
-    private var pairs = AppData.matchPairs.shuffled()
+    private var allpairs: [MatchPair] = []
+    private var pairs: [MatchPair] = []
     private var rightItems: [MatchPair] = []
     private var selectedLeftIndex: Int? = nil
     private var matchedPairs: Set<Int> = []
@@ -19,11 +20,36 @@ class MatchViewController: UIViewController {
         super.viewDidLoad()
         title = "Nối từ với nghĩa"
         view.backgroundColor = Theme.background
-        rightItems = pairs.shuffled()
+        allpairs = (APIService.share.response?.matchPairs ?? []).shuffled()
+        let randomPairs = Array(allpairs.shuffled().prefix(min(10, allpairs.count)))
+        pairs = randomPairs.shuffled()
+        rightItems = randomPairs.shuffled()
         setupUI()
     }
 
     private func setupUI() {
+        // ScrollView
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(scrollView)
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
+        
+        let contentView = UIView()
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.addSubview(contentView)
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor), // dùng contentLayoutGuide
+            contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor), // dùng frameLayoutGuide
+        ])
+        
         progressLabel.font = .systemFont(ofSize: 14)
         progressLabel.textColor = Theme.textSecondary
         progressLabel.textAlignment = .center
@@ -76,12 +102,14 @@ class MatchViewController: UIViewController {
         mainStack.axis = .vertical
         mainStack.spacing = 16
         mainStack.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(mainStack)
+        contentView.addSubview(mainStack)
         NSLayoutConstraint.activate([
-            mainStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            mainStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            mainStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            mainStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
+            mainStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            mainStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            mainStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20), // quan trọng để scroll đúng chiều cao
         ])
+        scrollView.alwaysBounceVertical = true
     }
 
     @objc private func leftTapped(_ sender: ChipButton) {
@@ -97,6 +125,7 @@ class MatchViewController: UIViewController {
         let rightPair = rightItems[sender.tag]
 
         if leftPair.right == rightPair.right {
+            SoundManager.shared.playCorrect()
             leftButtons[leftIdx].setMatched()
             sender.setMatched()
             matchedPairs.insert(leftIdx)
@@ -107,6 +136,7 @@ class MatchViewController: UIViewController {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { self.showFinal() }
             }
         } else {
+            SoundManager.shared.playWrong()
             leftButtons[leftIdx].setWrong()
             sender.setWrong()
             showMsg("❌ Sai! Thử lại nhé!", correct: false)
@@ -139,7 +169,7 @@ class MatchViewController: UIViewController {
 
 class PictureQuizViewController: UIViewController {
 
-    private let questions = AppData.pictureQuestions
+    private var questions: [PictureQuestion] = []
     private var currentIndex = 0
     private var score = 0
     private var answered = false
@@ -159,6 +189,7 @@ class PictureQuizViewController: UIViewController {
     }
 
     private func setupUI() {
+        questions = APIService.share.response?.pictureQuestions ?? []
         progressLabel.font = .systemFont(ofSize: 14)
         progressLabel.textColor = Theme.textSecondary
         progressLabel.textAlignment = .center
@@ -268,9 +299,11 @@ class PictureQuizViewController: UIViewController {
         optionButtons.forEach { btn in
             btn.isUserInteractionEnabled = false
             if btn.tag == q.correctIndex {
+                SoundManager.shared.playCorrect()
                 btn.backgroundColor = Theme.greenLight
                 btn.layer.borderColor = Theme.green.cgColor
             } else if btn.tag == sender.tag && !correct {
+                SoundManager.shared.playWrong()
                 btn.backgroundColor = Theme.redLight
                 btn.layer.borderColor = Theme.red.cgColor
             }
@@ -295,7 +328,7 @@ class PictureQuizViewController: UIViewController {
 
 class ArrangeViewController: UIViewController {
 
-    private let exercises = AppData.arrangeExercises
+    private var exercises: [ArrangeExercise] = []
     private var currentIndex = 0
     private var score = 0
     private var arrangedWords: [String] = []
@@ -335,6 +368,7 @@ class ArrangeViewController: UIViewController {
     }
     
     private func setupUI() {
+        exercises = APIService.share.response?.arrangeExercises ?? []
         progressLabel.font = .systemFont(ofSize: 14)
         progressLabel.textColor = Theme.textSecondary
         progressLabel.textAlignment = .center
@@ -463,6 +497,7 @@ class ArrangeViewController: UIViewController {
         let correct = userAnswer == ex.answer
 
         if correct {
+            SoundManager.shared.playCorrect()
             score += 1
             showResult("✅ Đúng rồi! \"\(ex.answer)\"", correct: true)
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
@@ -470,6 +505,7 @@ class ArrangeViewController: UIViewController {
                 self.loadQuestion()
             }
         } else {
+            SoundManager.shared.playWrong()
             showResult("❌ Sai rồi! Thử lại nhé!", correct: false)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                 self.arrangedWords = []
@@ -522,6 +558,7 @@ class ScoreViewController: UIViewController {
     }
 
     private func setupUI() {
+        SoundManager.shared.playComplete()
         let pct = total > 0 ? Double(score) / Double(total) : 0
         let (emoji, msg) = pct >= 0.8 ? ("🏆", "Xuất sắc!") : pct >= 0.5 ? ("⭐", "Khá tốt!") : ("💪", "Cố lên nhé!")
 

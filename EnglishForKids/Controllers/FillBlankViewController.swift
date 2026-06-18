@@ -2,7 +2,7 @@ import UIKit
 
 class FillBlankViewController: UIViewController {
 
-    private let exercises = AppData.fillExercises
+    private var exercises: [FillExercise] = []
     private var currentIndex = 0
     private var score = 0
 
@@ -24,6 +24,8 @@ class FillBlankViewController: UIViewController {
     }
 
     private func setupUI() {
+        exercises = APIService.share.response?.fillExercises ?? []
+        
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(scrollView)
@@ -173,6 +175,7 @@ class FillBlankViewController: UIViewController {
         let correct = input.lowercased() == ex.answer.lowercased()
 
         if correct {
+            SoundManager.shared.playCorrect()
             score += 1
             showResult(correct: true, message: "✅ Đúng rồi! \"\(ex.answer)\"")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
@@ -180,6 +183,7 @@ class FillBlankViewController: UIViewController {
                 self.loadQuestion()
             }
         } else {
+            SoundManager.shared.playWrong()
             showResult(correct: false, message: "❌ Sai rồi! Thử lại nhé!")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                 self.blankField?.text = ""

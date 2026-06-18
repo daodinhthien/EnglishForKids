@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Dialogue Models
 
-struct DialogueTopic {
+struct DialogueTopic: Codable {
     let id: String
     let emoji: String
     let label: String
@@ -12,42 +12,45 @@ struct DialogueTopic {
     let lines: [DialogueLine]
 }
 
-struct DialogueLine {
+struct DialogueLine: Codable {
     let speaker: String
     let avatar: String
     let side: Side
     let english: String
     let vietnamese: String
+}
 
-    enum Side { case left, right }
+enum Side: String, Codable {
+    case left
+    case right
 }
 
 // MARK: - Exercise Models
 
-struct FillExercise {
+struct FillExercise: Codable {
     let parts: [String]       // "__" marks the blank
     let answer: String
     let hint: String
     let wordBank: [String]
 }
 
-struct MatchPair {
+struct MatchPair: Codable {
     let left: String
     let right: String
 }
 
-struct PictureQuestion {
+struct PictureQuestion: Codable {
     let question: String
     let options: [PictureOption]
     let correctIndex: Int
 }
 
-struct PictureOption {
+struct PictureOption: Codable {
     let emoji: String
     let label: String
 }
 
-struct ArrangeExercise {
+struct ArrangeExercise: Codable {
     let hint: String
     let words: [String]
     let answer: String
