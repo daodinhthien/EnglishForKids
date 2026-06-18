@@ -15,3 +15,7 @@ struct Topic: Codable {
     let color: String        // màu hex
     let words: [Word]
 }
+
+struct LessonResponse: Codable {
+    let topics: [Topic]
+}

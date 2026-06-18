@@ -9,11 +9,11 @@ import UIKit
 
 class HomeViewController: UIViewController {
 
-    private let topics = LessonData.topics
+    private var topics: [Topic] = []
 
     private let titleLabel: UILabel = {
         let l = UILabel()
-        l.text = "🌟 Tiếng Anh Lớp 3"
+        l.text = "🌟 Tiếng Anh Cho Bé 🌟"
         l.font = .systemFont(ofSize: 28, weight: .bold)
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -69,6 +69,19 @@ class HomeViewController: UIViewController {
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
+        
+        getData()
+    }
+}
+
+extension HomeViewController {
+    private func getData() {
+        guard let url = Bundle.main.url(forResource: "vocabulary", withExtension: "json") else { return }
+        let data = try? Data(contentsOf: url)
+        if let response = data.flatMap({ try? JSONDecoder().decode(LessonResponse.self, from: $0) }) {
+            self.topics = response.topics
+            collectionView.reloadData()
+        }
     }
 }
 

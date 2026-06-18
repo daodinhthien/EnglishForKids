@@ -89,17 +89,17 @@ class TopicCell: UICollectionViewCell {
 }
 
 // MARK: - UIColor hex extension
-extension UIColor {
-    convenience init(hex: String) {
-        var hexStr = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-        if hexStr.hasPrefix("#") { hexStr.removeFirst() }
-        var rgb: UInt64 = 0
-        Scanner(string: hexStr).scanHexInt64(&rgb)
-        self.init(
-            red: CGFloat((rgb >> 16) & 0xFF) / 255,
-            green: CGFloat((rgb >> 8) & 0xFF) / 255,
-            blue: CGFloat(rgb & 0xFF) / 255,
-            alpha: 1
-        )
-    }
-}
+//extension UIColor {
+//    convenience init(hex: String) {
+//        var hexStr = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+//        if hexStr.hasPrefix("#") { hexStr.removeFirst() }
+//        var rgb: UInt64 = 0
+//        Scanner(string: hexStr).scanHexInt64(&rgb)
+//        self.init(
+//            red: CGFloat((rgb >> 16) & 0xFF) / 255,
+//            green: CGFloat((rgb >> 8) & 0xFF) / 255,
+//            blue: CGFloat(rgb & 0xFF) / 255,
+//            alpha: 1
+//        )
+//    }
+//}

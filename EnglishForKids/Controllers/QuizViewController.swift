@@ -221,7 +221,7 @@ class QuizViewController: UIViewController {
         speak(current.english)
 
         // Tạo 4 đáp án: 1 đúng + 3 sai
-        var wrongAnswers = topic.words.filter { $0.english != current.english }.shuffled().prefix(3)
+        let wrongAnswers = topic.words.filter { $0.english != current.english }.shuffled().prefix(3)
         var options = Array(wrongAnswers) + [current]
         options.shuffle()
 
