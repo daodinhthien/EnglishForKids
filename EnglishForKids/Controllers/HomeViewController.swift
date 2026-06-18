@@ -70,17 +70,45 @@ class HomeViewController: UIViewController {
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
         
-        getData()
+        checkForUpdates()
+    }
+    
+    private func checkForUpdates() {
+        let localVersion = UserDefaults.standard.integer(forKey: "contentVersion")
+        
+        Task {
+            let remote = try? await APIService.share.checkRemoteConfig()
+            
+            if let remote = remote, remote.contentVersion > localVersion {
+                try await APIService.share.downloadVocabularies()
+                
+                UserDefaults.standard.set(
+                    remote.contentVersion,
+                    forKey: "contentVersion"
+                )
+            }
+            
+            await getData()
+        }
     }
 }
 
 extension HomeViewController {
-    private func getData() {
-        guard let url = Bundle.main.url(forResource: "vocabulary", withExtension: "json") else { return }
-        let data = try? Data(contentsOf: url)
+    private func getData() async {
+//        guard let url = Bundle.main.url(forResource: "vocabulary", withExtension: "json") else { return }
+        let document = FileManager.default.urls(
+            for: .documentDirectory,
+            in: .userDomainMask
+        )[0]
+        
+        let fileURL = document.appendingPathComponent( "vocabulary.json")
+        let data = try? Data(contentsOf: fileURL)
+        
         if let response = data.flatMap({ try? JSONDecoder().decode(LessonResponse.self, from: $0) }) {
-            self.topics = response.topics
-            collectionView.reloadData()
+            await MainActor.run {
+                self.topics = response.topics
+                self.collectionView.reloadData()
+            }
         }
     }
 }
