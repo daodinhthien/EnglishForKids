@@ -157,19 +157,19 @@ class QuizViewController: UIViewController {
 
     private func setupMultipleChoiceUI() {
         view.addSubview(questionCard)
-        questionCard.addSubview(emojiLabel)
+//        questionCard.addSubview(emojiLabel)
         questionCard.addSubview(questionLabel)
 
         NSLayoutConstraint.activate([
             questionCard.topAnchor.constraint(equalTo: progressLabel.bottomAnchor, constant: 16),
             questionCard.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             questionCard.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            questionCard.heightAnchor.constraint(equalToConstant: 160),
+            questionCard.heightAnchor.constraint(equalToConstant: 100),
 
-            emojiLabel.topAnchor.constraint(equalTo: questionCard.topAnchor, constant: 16),
-            emojiLabel.centerXAnchor.constraint(equalTo: questionCard.centerXAnchor),
+//            emojiLabel.topAnchor.constraint(equalTo: questionCard.topAnchor, constant: 16),
+//            emojiLabel.centerXAnchor.constraint(equalTo: questionCard.centerXAnchor),
 
-            questionLabel.topAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 8),
+            questionLabel.centerYAnchor.constraint(equalTo: questionCard.centerYAnchor, constant: 0),
             questionLabel.leadingAnchor.constraint(equalTo: questionCard.leadingAnchor, constant: 12),
             questionLabel.trailingAnchor.constraint(equalTo: questionCard.trailingAnchor, constant: -12),
         ])
