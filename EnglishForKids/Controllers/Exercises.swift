@@ -71,7 +71,7 @@ class MatchViewController: UIViewController {
         rightStack.spacing = 10
 
         for (i, pair) in pairs.enumerated() {
-            let btn = ChipButton(title: pair.left)
+            let btn = ChipButton(title: pair.left.removingEmojis)
             btn.tag = i
             btn.addTarget(self, action: #selector(leftTapped(_:)), for: .touchUpInside)
             leftStack.addArrangedSubview(btn)
@@ -618,5 +618,13 @@ class ScoreViewController: UIViewController {
 
     @objc private func goMenu() {
         navigationController?.popToRootViewController(animated: true)
+    }
+}
+
+extension String {
+    var removingEmojis: String {
+        unicodeScalars
+            .filter { !$0.properties.isEmojiPresentation }
+            .reduce("") { $0 + String($1) }
     }
 }

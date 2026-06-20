@@ -309,7 +309,7 @@ class QuizViewController: UIViewController {
 
         for (i, word) in leftWords.enumerated() {
             let btn = UIButton(type: .system)
-            btn.setTitle("\(word.emoji) \(word.english)", for: .normal)
+            btn.setTitle("\(word.english)", for: .normal)
             btn.titleLabel?.font = .systemFont(ofSize: 15, weight: .medium)
             btn.backgroundColor = .secondarySystemBackground
             btn.setTitleColor(.label, for: .normal)

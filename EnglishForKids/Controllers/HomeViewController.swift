@@ -95,7 +95,6 @@ class HomeViewController: UIViewController {
 
 extension HomeViewController {
     private func getData() async {
-//        guard let url = Bundle.main.url(forResource: "vocabulary", withExtension: "json") else { return }
         let document = FileManager.default.urls(
             for: .documentDirectory,
             in: .userDomainMask
@@ -107,6 +106,24 @@ extension HomeViewController {
         if let response = data.flatMap({ try? JSONDecoder().decode(LessonResponse.self, from: $0) }) {
             APIService.share.response = response
             
+            await MainActor.run {
+                self.topics = response.topics ?? []
+                self.collectionView.reloadData()
+            }
+        }
+        else {
+            await getLocalData()
+        }
+    }
+    
+    private func getLocalData() async {
+        let localData = LessonResponse(topics: nil, dialogues: AppData.dialogues, fillExercises: AppData.fillExercises, matchPairs: AppData.matchPairs, pictureQuestions: AppData.pictureQuestions, arrangeExercises: AppData.arrangeExercises)
+        APIService.share.response = localData
+        
+        guard let url = Bundle.main.url(forResource: "vocabulary", withExtension: "json") else { return }
+        let data = try? Data(contentsOf: url)
+        
+        if let response = data.flatMap({ try? JSONDecoder().decode(LessonResponse.self, from: $0) }) {
             await MainActor.run {
                 self.topics = response.topics ?? []
                 self.collectionView.reloadData()
